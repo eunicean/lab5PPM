@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -70,10 +71,47 @@ fun  mainScreenJokes(){
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){}
+    ){
+        var quoteTrash by remember{ mutableStateOf("Tronald Ddump")}
+        getQuoteDump(quoteTruTrash = quoteTrash)
+        Spacer(modifier = Modifier.height(15.dp))
+        Button(
+            modifier = Modifier
+                .width(190.dp)
+                .height(45.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xff0077B6),
+            ),
+            onClick = { getAPIRandomQuote(){quote -> quoteTrash = quote} }
+        ) {
+            Text(text = "Random")
+        }
+        Spacer(modifier = Modifier.height(5.dp))
+        Button(
+            modifier = Modifier
+                .width(190.dp)
+                .height(45.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xff0077B6),
+            ),
+            onClick = {getAPIRandomMeme(){quote -> quoteTrash = quote}}
+        ) {
+            Text(text = "Meme")
+        }
+    }
 }
+
+@Composable
+fun getQuoteDump(quoteTruTrash:String){
+    Text(text = quoteTruTrash,
+        modifier = Modifier.padding(20.dp),
+        color = Color(2,62,138),
+        fontWeight = FontWeight.Bold,
+        fontSize = 25.sp)
+}
+
 const val BASE_URL = "https://www.tronalddump.io/"
-private fun getAPIJoke(){
+private fun getAPIRandomQuote(onSuccess: (String) -> Unit){
     val retrofitBuilder = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(BASE_URL)
@@ -81,6 +119,50 @@ private fun getAPIJoke(){
         .create(ApiInterface::class.java)
 
     val retrofitData = retrofitBuilder.getRandomQuote()
+
+    retrofitData.enqueue(object : Callback<TrumpDump?> {
+        override fun onResponse(call: Call<TrumpDump?>, response: Response<TrumpDump?>) {
+            val responseBody = response.body()
+            if (response != null){
+                val quote = "Theme" + responseBody?.tags.toString() + "\n'' " + responseBody?.value + " ''\n   " + responseBody?.appeared_at
+                onSuccess(quote)
+            }
+            else{
+                onSuccess("No quote :(")
+            }
+        }
+
+        override fun onFailure(call: Call<TrumpDump?>, t: Throwable) {
+            onSuccess("Failure")
+        }
+    })
+}
+
+private fun getAPIRandomMeme(onSuccess: (String) -> Unit){
+    val retrofitBuilder = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(BASE_URL)
+        .build()
+        .create(ApiInterface::class.java)
+
+    val retrofitData = retrofitBuilder.getRandomMeme()
+
+    retrofitData.enqueue(object : Callback<TrumpDump?> {
+        override fun onResponse(call: Call<TrumpDump?>, response: Response<TrumpDump?>) {
+            val responseBody = response.body()
+            if (response != null){
+                val quote = "Theme" + responseBody?.tags.toString() + "\n'' " + responseBody?.value + " ''\n   " + responseBody?.appeared_at
+                onSuccess(quote)
+            }
+            else{
+                onSuccess("No quote :(")
+            }
+        }
+
+        override fun onFailure(call: Call<TrumpDump?>, t: Throwable) {
+            onSuccess("Failure")
+        }
+    })
 }
 @Preview
 @Composable
