@@ -49,6 +49,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+const val BASE_URL = "https://www.tronalddump.io/"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,7 +111,7 @@ fun getQuoteDump(quoteTruTrash:String){
         fontSize = 25.sp)
 }
 
-const val BASE_URL = "https://www.tronalddump.io/"
+
 private fun getAPIRandomQuote(onSuccess: (String) -> Unit){
     val retrofitBuilder = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
@@ -118,13 +119,13 @@ private fun getAPIRandomQuote(onSuccess: (String) -> Unit){
         .build()
         .create(ApiInterface::class.java)
 
-    val retrofitData = retrofitBuilder.getRandomQuote()
+    val retrofitData:Call<TrumpDump> = retrofitBuilder.getRandomQuote()
 
-    retrofitData.enqueue(object : Callback<TrumpDump?> {
-        override fun onResponse(call: Call<TrumpDump?>, response: Response<TrumpDump?>) {
+    retrofitData.enqueue(object : Callback<TrumpDump> {
+        override fun onResponse(call: Call<TrumpDump>, response: Response<TrumpDump>) {
             val responseBody = response.body()
             if (response != null){
-                val quote = "Theme" + responseBody?.tags.toString() + "\n'' " + responseBody?.value + " ''\n   " + responseBody?.appeared_at
+                val quote = "Theme: " + responseBody?.tags.toString() + "\n'' " + responseBody?.value + " ''\n   " + responseBody?.appeared_at
                 onSuccess(quote)
             }
             else{
@@ -145,10 +146,10 @@ private fun getAPIRandomMeme(onSuccess: (String) -> Unit){
         .build()
         .create(ApiInterface::class.java)
 
-    val retrofitData = retrofitBuilder.getRandomMeme()
+    val retrofitData:Call<TrumpDump> = retrofitBuilder.getRandomMeme()
 
-    retrofitData.enqueue(object : Callback<TrumpDump?> {
-        override fun onResponse(call: Call<TrumpDump?>, response: Response<TrumpDump?>) {
+    retrofitData.enqueue(object : Callback<TrumpDump> {
+        override fun onResponse(call: Call<TrumpDump>, response: Response<TrumpDump>) {
             val responseBody = response.body()
             if (response != null){
                 val quote = "Theme" + responseBody?.tags.toString() + "\n'' " + responseBody?.value + " ''\n   " + responseBody?.appeared_at
